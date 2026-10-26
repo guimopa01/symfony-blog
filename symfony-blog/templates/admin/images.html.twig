@@ -6,32 +6,15 @@
     <div class="container">
         <div class="col-xs-12 col-sm-8 col-sm-push-2">
             <h1>Images</h1>
-            {{ form(form, {'attr': {'class':'form-horizontal'}}) }}
-            <hr class="divider">
-            <hr class="divider">
-            <div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">File</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for image in images %}
-                        <tr>
-                            <th scope="row">{{ image.id }}</th>
-                            <td>
-                                <img src="{{ asset('images/index/gallery/' ~ image.file) }}" alt="{{ image.file }}">
-                            </td>
-                            <td>
-                                {{ image.category.name }}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            {{ form_start(Imageform, {'attr': {'class':'form-horizontal'}}) }}
+            <div class="form-group">
+                {{ form_row(Imageform.file, {'attr': {'class':'form-control'}}) }}
+                {{ form_row(Imageform.category, {'attr': {'class':'form-control'}}) }}
+                {{ form_row(Imageform.Send, {'attr': {'class':'btn btn-primary'}}) }}
             </div>
+            {{ form_end(Imageform) }}
+            <hr class="divider">
+            <hr class="divider">
         </div>
     </div>
 </div>

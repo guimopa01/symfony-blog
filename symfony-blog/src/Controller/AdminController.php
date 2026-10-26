@@ -70,7 +70,7 @@ class AdminController extends AbstractController
         $images = $repositorio->findAll();
 
         return $this->render('admin/images.html.twig', array(
-                        'form' => $form->createView(),
+                        'Imageform' => $form->createView(),
                         'images' => $images
                     ));
     }
