@@ -22,8 +22,7 @@ class PostFormType extends AbstractType
         {
             $builder
                 ->add('title', TextType::class, [
-                    'required' => false, 
-                    'mapped' => false, 
+                    'required' => true, 
                     'constraints' => [
                         new NotBlank(
                             message: 'Please enter title'
@@ -32,8 +31,7 @@ class PostFormType extends AbstractType
                 ])
 
                 ->add('content', TextareaType::class, [
-                    'required' => true, 
-                    'mapped' => false, 
+                    'required' => true,
                     'constraints' => [
                         new NotBlank(
                             message: 'Please enter content'
@@ -42,6 +40,7 @@ class PostFormType extends AbstractType
                 ] )
 
                 ->add('image', FileType::class,[
+                    'label' => 'Imagen',
                     'required' => true,
                     'mapped' => false,
                     'constraints' => [
