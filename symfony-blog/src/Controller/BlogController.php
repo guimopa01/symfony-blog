@@ -5,18 +5,35 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Post;
 
 final class BlogController extends AbstractController
 {
-    #[Route('/blog', name: 'blog')]
-    public function blog(): Response
+    #[Route('/blog/{page}', name: 'blog', requirements: ['page' => '\d+'])]
+    public function index(ManagerRegistry $doctrine, int $page = 1): Response
     {
-        return $this->render('blog.html.twig');
+        $repository = $doctrine->getRepository(Post::class);
+        $posts = $repository->findAll($page);
+        $recents = $repository->findRecents();
+        return $this->render('blog/blog.html.twig', [
+            'posts' => $posts,
+            'recents' => $recents,
+        ]);
     }
 
-    #[Route('/single_post', name: 'single_post')]
-    public function single_post(): Response
+
+    #[Route('/blog/single_post/{slug}', name: 'single_post')]
+    public function post(ManagerRegistry $doctrine, $slug): Response
     {
-        return $this->render('single_post.html.twig');
+        $repository = $doctrine->getRepository(Post::class);
+        $post = $repository->findOneBy(["slug"=>$slug]);
+
+        $recents = $repository->findRecents();
+        return $this->render('blog/single_post.html.twig', [
+            'post' => $post,
+            'recents' => $recents
+        ]);
     }
+
 }
