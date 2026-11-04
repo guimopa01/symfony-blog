@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @extends ServiceEntityRepository<Post>
@@ -40,6 +41,30 @@ class PostRepository extends ServiceEntityRepository
         ->getResult()
     ;
     }
+
+    public function findPaginados(int $page, int $perPage): Paginator
+{
+    $query = $this->createQueryBuilder('p')
+        ->orderBy('p.PublishedAt', 'DESC')
+        ->setFirstResult(($page - 1) * $perPage)
+        ->setMaxResults($perPage)
+        ->getQuery();
+
+    return new Paginator($query, false);
+}
+
+public function findBuscadosPaginados(string $searchTerm, int $page, int $perPage): Paginator
+{
+    $query = $this->createQueryBuilder('p')
+        ->andWhere('p.Content LIKE :val')
+        ->setParameter('val', '%'.$searchTerm.'%')
+        ->orderBy('p.PublishedAt', 'DESC')
+        ->setFirstResult(($page - 1) * $perPage)
+        ->setMaxResults($perPage)
+        ->getQuery();
+
+    return new Paginator($query, false);
+}
 
     //    /**
     //     * @return Post[] Returns an array of Post objects

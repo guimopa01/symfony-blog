@@ -1,155 +1,97 @@
 {% extends 'base.html.twig' %}
+
+{% block title %}Blog{% endblock %}
+
 {% block body %}
-<!DOCTYPE html>
-<html lang="en">
+<!-- Principal Content Start -->
+<div id="blog">
+    <div class="container">
+        <div class="row">
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PhotographItem-Responsive Theme | Blog</title>
+            <!-- Blocks of Posts (Izquierda) -->
+            <div class="col-xs-12 col-sm-8">
 
-    <!-- Bootstrap core css -->
-    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
-    <!-- Bootstrap core css -->
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <!-- Font Awesome icons -->
-    <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css">
+                {% if searchTerm is defined and searchTerm %}
+                <h3>Resultados de la búsqueda para: "{{ searchTerm }}" ({{ total }} encontrados)</h3>
+                <hr>
+                {% endif %}
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-</head>
+                {% if total > 0 %}
+                {% for post in posts %}
+                {{ include('partials/_post.html.twig', {'post': post}) }}
+                {% endfor %}
 
-<body id="page-top">
-
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-fixed-top navbar-default">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menu">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand page-scroll" href="#page-top">
-                    <span>[PHOTO]</span>
-                </a>
-            </div>
-            <div class="collapse navbar-collapse navbar-right" id="menu">
-                <ul class="nav navbar-nav">
-                    <li class=" lien"><a href="index.html"><i class="fa fa-home sr-icons"></i> Home</a></li>
-                    <li class="lien"><a href="about.html"><i class="fa fa-bookmark sr-icons"></i> About</a></li>
-                    <li class="active lien"><a href="#"><i class="fa fa-file-text sr-icons"></i> Blog</a></li>
-                    <li><a href="contact.html"><i class="fa fa-phone-square sr-icons"></i> Contact</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <!-- End of Navigation Bar -->
-
-    <!-- Principal Content Start -->
-    <div id="blog">
-        <div class="container">
-            <div class="row">
-
-                <!-- Blocks of Posts -->
-                <div class="col-xs-12 col-sm-8 row">
-                    {% for post in posts %}
-                    {{ include ('partials/_post.html.twig', {'post': post}) }}
-                    {% endfor %}
+                <!-- Paginador dinámico reutilizable -->
+                <div class="text-left">
+                    {% if searchTerm is defined and searchTerm %}
+                    {{ include('partials/_paginador.html.twig', {
+                    'page': page,
+                    'totalPages': totalPages,
+                    'ruta': 'blog_buscar',
+                    'parametros': {'searchTerm': searchTerm}
+                    }) }}
+                    {% else %}
+                    {{ include('partials/_paginador.html.twig', {
+                    'page': page,
+                    'totalPages': totalPages,
+                    'ruta': 'blog'
+                    }) }}
+                    {% endif %}
                 </div>
-                <!-- End of Blog Post -->
+                {% else %}
+                <div class="alert alert-warning text-center"
+                    style="padding: 30px; margin-top: 20px; background-color: #fcf8e3; color: #8a6d3b; border: 1px solid #faebcc; border-radius: 4px;">
+                    <i class="fa fa-exclamation-triangle fa-2x" style="margin-bottom: 10px;"></i>
+                    <h4 style="margin: 0 0 10px 0; font-weight: bold;">No se han encontrado posts</h4>
+                    <p style="margin: 0;">Prueba a buscar con otras palabras o términos diferentes.</p>
+                </div>
+                {% endif %}
 
-                <!-- Side bar -->
-                <div class="col-xs-12 col-sm-4">
-                    <form class="form-horizontal">
-                        <div class="input-group">
-                            <input class="form-control" type="text" placeholder="Research">
-                            <span class="input-group-btn">
-                                <a href="" class="btn"><i class="fa fa-search"></i></a>
-                            </span>
-                        </div>
-                    </form>
-                    <div class="panel">
-                        <div class="panel-heading">
-                            <h4>Categories</h4>
-                        </div>
-                        <div class="panel-body">
-                            <ul class="nav">
-                                <li><a href="#">Category I</a></li>
-                                <li><a href="#">Category II</a></li>
-                                <li><a href="#">Category III</a></li>
-                                <li><a href="#">Category IV</a></li>
-                                <li class="last"><a href="#">Category V</a></li>
-                            </ul>
-                        </div>
+            </div>
+            <!-- End of Blog Post -->
+
+            <!-- Side bar (Derecha) -->
+            <div class="col-xs-12 col-sm-4">
+
+                <!-- Formulario de búsqueda según la guía 5.11 -->
+                <form class="" action="{{ path('blog_buscar') }}">
+                    <input type="text" class="form-control" style="display:unset; width:85%" placeholder="Research"
+                        name="searchTerm" value="{{ searchTerm is defined ? searchTerm : '' }}">
+                    <button type="submit" class="btn btn-primary btn-danger"><i class="fa fa-search"></i></button>
+                </form>
+
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h4>Categories</h4>
                     </div>
-                    <div class="well">
-                        <h4>Soluta</h4>
-                        <p>Quod soluta corrupti earum officia vel inventore vitae quidem, consequuntur odit impedit.</p>
-                    </div>
-                    <h3>Recent Posts</h3>
-                    <hr>
-                    <div class="post">
-                        {% for recent in recents %}
-                        {{ include ('partials/_recent_blog.html.twig', {'recent': recent}) }}
-                        {% endfor %}
-                    </div>
-                    <div class="post">
-                        <div class="post-heading">
-                            <span>12 MAY</span>
-                            <img class="img-responsive" src="images/blog/woman.jpg" alt="post's picture">
-                        </div>
-                        <div class="post-body">
-                            <span>
-                                <i class="fa fa-heart sr-icons"></i> 10
-                                <i class="fa fa-comments sr-icons"></i> 10
-                            </span>
-                            <h4 class="text-left"><a href="single_post.html"><strong>Consequuntur</strong></a></h4>
-                        </div>
+                    <div class="panel-body">
+                        <ul class="nav">
+                            <li><a href="#">Category I</a></li>
+                            <li><a href="#">Category II</a></li>
+                            <li><a href="#">Category III</a></li>
+                            <li><a href="#">Category IV</a></li>
+                            <li class="last"><a href="#">Category V</a></li>
+                        </ul>
                     </div>
                 </div>
-                <!-- End of Side bar -->
+                <div class="well">
+                    <h4>Soluta</h4>
+                    <p>Quod soluta corrupti earum officia vel inventore vitae quidem, consequuntur odit impedit.</p>
+                </div>
+
+                <h3>Recent Posts</h3>
+                <hr>
+
+                <!-- Bucle dinámico que inyecta los posts recientes con su partial original -->
+                {% for recent in recents %}
+                {{ include('partials/_recent_post.html.twig', {'recent': recent}) }}
+                {% endfor %}
 
             </div>
+            <!-- End of Side bar -->
+
         </div>
     </div>
-    <!-- End of Principal Content Start -->
-
-    <!-- Footer -->
-    <footer>
-        <div class="container text-muted text-center">
-            <ul class="list-inline social-buttons">
-                <li><a href="#"><i class="fa fa-facebook sr-icons"></i></a>
-                </li>
-                <li><a href="#"><i class="fa fa-twitter sr-icons"></i></a>
-                </li>
-                <li><a href="#"><i class="fa fa-google-plus sr-icons"></i></a>
-                </li>
-            </ul>
-            <ul class="list-inline">
-                <li class="footer-number"><i class="fa fa-phone sr-icons"></i> (00228)92229954 </li>
-                <li><i class="fa fa-envelope sr-icons"></i> kouvenceslas93@gmail.com</li>
-            </ul>
-            <p>Photography Fanatic Template &copy; 2017</p>
-        </div>
-    </footer>
-
-    <!-- Jquery -->
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <!-- Bootstrap core Javascript -->
-    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-    <!-- Plugins -->
-    <script type="text/javascript" src="js/jquery.easing.min.js"></script>
-    <script type="text/javascript" src="js/jquery.magnific-popup.min.js"></script>
-    <script type="text/javascript" src="js/scrollreveal.min.js"></script>
-    <script type="text/javascript" src="js/script.js"></script>
-</body>
-
-</html>
+</div>
+<!-- End of Principal Content Start -->
 {% endblock %}
