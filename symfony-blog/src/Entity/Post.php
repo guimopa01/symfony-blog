@@ -141,6 +141,13 @@ class Post
         return $this;
     }
 
+    public function like(): static
+    {
+        $this->numLikes = ($this->numLikes ?? 0) + 1;
+
+        return $this;
+    }
+
     public function getNumComments(): ?int
     {
         return $this->numComments;

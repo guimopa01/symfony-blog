@@ -1,97 +1,93 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Blog{% endblock %}
 
 {% block body %}
-<!-- Principal Content Start -->
-<div id="blog">
-    <div class="container">
-        <div class="row">
+<div id="blog" class="container">
+    <header class="page-header-block">
+        <span class="eyebrow">Journal</span>
+        {% if searchTerm is defined and searchTerm %}
+            <h1>Results for “{{ searchTerm }}”</h1>
+        {% else %}
+            <h1>Blog</h1>
+        {% endif %}
+    </header>
 
-            <!-- Blocks of Posts (Izquierda) -->
-            <div class="col-xs-12 col-sm-8">
-
-                {% if searchTerm is defined and searchTerm %}
-                <h3>Resultados de la búsqueda para: "{{ searchTerm }}" ({{ total }} encontrados)</h3>
-                <hr>
-                {% endif %}
-
+    <div class="row">
+        <div class="col-xs-12 col-md-8">
+            <div id="post-list">
                 {% if total > 0 %}
-                {% for post in posts %}
-                {{ include('partials/_post.html.twig', {'post': post}) }}
-                {% endfor %}
+                    <div class="results-bar glass" role="status">
+                        <span class="results-count">
+                            <i class="fa fa-file-text-o"></i>
+                            Mostrando <strong>{{ posts.iterator|length }}</strong> de <strong>{{ total }}</strong> {{ total == 1 ? 'post' : 'posts' }}
+                        </span>
+                        <span class="results-page">Página {{ page }} <span class="results-sep">/</span> {{ totalPages }}</span>
+                        <span class="results-progress" aria-hidden="true">
+                            <span style="--value: {{ (page / totalPages * 100)|round }}%"></span>
+                        </span>
+                    </div>
 
-                <!-- Paginador dinámico reutilizable -->
-                <div class="text-left">
-                    {% if searchTerm is defined and searchTerm %}
-                    {{ include('partials/_paginador.html.twig', {
-                    'page': page,
-                    'totalPages': totalPages,
-                    'ruta': 'blog_buscar',
-                    'parametros': {'searchTerm': searchTerm}
-                    }) }}
+                    {% for post in posts %}
+                        {{ include('partials/_post.html.twig', {'post': post}) }}
+                    {% endfor %}
+
+                    {% if searchTerm is defined %}
+                        {{ include('partials/_paginador.html.twig', {
+                            'page': page,
+                            'totalPages': totalPages,
+                            'ruta': 'blog_buscar',
+                            'parametros': {'searchTerm': searchTerm}
+                        }) }}
                     {% else %}
-                    {{ include('partials/_paginador.html.twig', {
-                    'page': page,
-                    'totalPages': totalPages,
-                    'ruta': 'blog'
-                    }) }}
+                        {{ include('partials/_paginador.html.twig', {
+                            'page': page,
+                            'totalPages': totalPages,
+                            'ruta': 'blog'
+                        }) }}
                     {% endif %}
-                </div>
                 {% else %}
-                <div class="alert alert-warning text-center"
-                    style="padding: 30px; margin-top: 20px; background-color: #fcf8e3; color: #8a6d3b; border: 1px solid #faebcc; border-radius: 4px;">
-                    <i class="fa fa-exclamation-triangle fa-2x" style="margin-bottom: 10px;"></i>
-                    <h4 style="margin: 0 0 10px 0; font-weight: bold;">No se han encontrado posts</h4>
-                    <p style="margin: 0;">Prueba a buscar con otras palabras o términos diferentes.</p>
-                </div>
+                    <div class="card empty-state">
+                        <i class="fa fa-search"></i>
+                        No posts found.
+                    </div>
                 {% endif %}
-
             </div>
-            <!-- End of Blog Post -->
-
-            <!-- Side bar (Derecha) -->
-            <div class="col-xs-12 col-sm-4">
-
-                <!-- Formulario de búsqueda según la guía 5.11 -->
-                <form class="" action="{{ path('blog_buscar') }}">
-                    <input type="text" class="form-control" style="display:unset; width:85%" placeholder="Research"
-                        name="searchTerm" value="{{ searchTerm is defined ? searchTerm : '' }}">
-                    <button type="submit" class="btn btn-primary btn-danger"><i class="fa fa-search"></i></button>
-                </form>
-
-                <div class="panel">
-                    <div class="panel-heading">
-                        <h4>Categories</h4>
-                    </div>
-                    <div class="panel-body">
-                        <ul class="nav">
-                            <li><a href="#">Category I</a></li>
-                            <li><a href="#">Category II</a></li>
-                            <li><a href="#">Category III</a></li>
-                            <li><a href="#">Category IV</a></li>
-                            <li class="last"><a href="#">Category V</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="well">
-                    <h4>Soluta</h4>
-                    <p>Quod soluta corrupti earum officia vel inventore vitae quidem, consequuntur odit impedit.</p>
-                </div>
-
-                <h3>Recent Posts</h3>
-                <hr>
-
-                <!-- Bucle dinámico que inyecta los posts recientes con su partial original -->
-                {% for recent in recents %}
-                {{ include('partials/_recent_post.html.twig', {'recent': recent}) }}
-                {% endfor %}
-
-            </div>
-            <!-- End of Side bar -->
-
         </div>
+
+        <aside class="col-xs-12 col-md-4 sidebar">
+            <form id="search-form" class="input-pill" action="{{ path('blog_buscar') }}" role="search">
+                <input type="search" class="form-control" placeholder="Search posts…" name="searchTerm"
+                       value="{{ searchTerm is defined ? searchTerm : '' }}" aria-label="Search posts">
+                <button type="submit" class="btn btn-icon btn-primary" aria-label="Search"><i class="fa fa-search"></i></button>
+            </form>
+
+            <div class="card card-sm" data-reveal>
+                <h4>Categories</h4>
+                <ul class="link-list">
+                    <li><a href="#">Category I</a></li>
+                    <li><a href="#">Category II</a></li>
+                    <li><a href="#">Category III</a></li>
+                    <li><a href="#">Category IV</a></li>
+                    <li><a href="#">Category V</a></li>
+                </ul>
+            </div>
+
+            <div class="card card-sm glass" data-reveal>
+                <h4>Soluta</h4>
+                <p class="text-muted" style="margin:0">Quod soluta corrupti earum officia vel inventore vitae quidem, consequuntur odit impedit.</p>
+            </div>
+
+            <div class="card card-sm" data-reveal>
+                <h4>Recent posts</h4>
+                {% if recents is defined and recents|length > 0 %}
+                    {% for recent in recents %}
+                        {{ include('partials/_recent_post.html.twig', {recent: recent}) }}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted" style="margin:0">No recent posts yet.</p>
+                {% endif %}
+            </div>
+        </aside>
     </div>
 </div>
-<!-- End of Principal Content Start -->
 {% endblock %}

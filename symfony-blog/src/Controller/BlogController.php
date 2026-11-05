@@ -3,16 +3,20 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Comment;
 use App\Entity\Post;
+use App\Form\CommentFormType;
 
 final class BlogController extends AbstractController
 {
     private const POSTS_PER_PAGE = 5; //Ponlo a 1 para pruebas
 
-#[Route('/blog/{page}', name: 'blog')]
+#[Route('/blog/{page}', name: 'blog', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
 public function index(ManagerRegistry $doctrine, int $page = 1): Response
 {
     $page = max(1, $page);
@@ -39,7 +43,7 @@ public function index(ManagerRegistry $doctrine, int $page = 1): Response
     ]);
 }
 
-#[Route('/blog/buscar/{page}', name: 'blog_buscar')]
+#[Route('/blog/buscar/{page}', name: 'blog_buscar', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
 public function buscar(ManagerRegistry $doctrine, Request $request, int $page = 1): Response
 {
     $page = max(1, $page);
@@ -95,19 +99,24 @@ public function buscar(ManagerRegistry $doctrine, Request $request, int $page = 
     ]);
 }
 
-#[Route('/blog/single_post/{slug}/like', name: 'post_like')]
-public function like(ManagerRegistry $doctrine, $slug): Response
+#[Route('/blog/single_post/{slug}/like', name: 'post_like', methods: ['POST'])]
+public function like(ManagerRegistry $doctrine, $slug): JsonResponse
 {
     $repository = $doctrine->getRepository(Post::class);
     $post = $repository->findOneBy(["slug"=>$slug]);
-    if ($post){
-        // Haz un método llamado like() en la entidad Post que aumente en 1 numLikes
-        $post->like();
-        $entityManager = $doctrine->getManager();    
-        $entityManager->persist($post);
-        $entityManager->flush();
+    if (!$post) {
+        throw $this->createNotFoundException();
     }
-    return $this->redirectToRoute('single_post', ["slug" => $post->getSlug()]);
+
+    $post->like();
+    $entityManager = $doctrine->getManager();
+    $entityManager->persist($post);
+    $entityManager->flush();
+
+    return $this->json([
+        'success' => true,
+        'likes' => $post->getNumLikes(),
+    ]);
 
 }
 
